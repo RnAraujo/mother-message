@@ -10,3 +10,10 @@ node_modules/
 # Sistema Operativo
 .DS_Store
 Thumbs.db
+
+# Migrations
+emotion/migrations/
+
+# Cache
+emotion/__pycache__/
+mysite/__pycache__/
