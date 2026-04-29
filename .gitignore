@@ -12,7 +12,7 @@ node_modules/
 Thumbs.db
 
 # Migrations
-emotion/migrations/
+emotion/migrations/__pycache__/
 
 # Cache
 emotion/__pycache__/
