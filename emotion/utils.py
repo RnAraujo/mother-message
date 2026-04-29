@@ -3,7 +3,8 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from django.conf import settings
 from .forms import CustomUserCreationForm
-
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
 
 def generate_qr_code(student):
     """Genera QR para un estudiante"""
@@ -11,7 +12,7 @@ def generate_qr_code(student):
     base_url = settings.BASE_DIR  # En producción usar dominio real
     from django.urls import reverse
     relative_url = reverse('student_card', kwargs={'student_id': student.id})
-    full_url = f"http://localhost:8000{relative_url}"  # Cambiar en producción
+    full_url = f"https://parati.peruano365.org.pe{relative_url}"  # Cambiar en producción
     
     # Crear QR
     qr = qrcode.QRCode(
