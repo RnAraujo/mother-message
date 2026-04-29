@@ -1,0 +1,273 @@
+<!-- templates/edit_student.html -->
+{% extends "emotion/base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Encabezado -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">
+                        <i class="fas fa-edit text-yellow-600 mr-3"></i>
+                        Editar Estudiante
+                    </h1>
+                    <p class="text-gray-600 mt-2">Actualiza la información del estudiante</p>
+                </div>
+                <a href="{% url 'dashboard' %}" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Volver al Dashboard
+                </a>
+            </div>
+        </div>
+        
+        <!-- Formulario -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-yellow-500 to-orange-500">
+                <h2 class="text-xl font-semibold text-white">
+                    <i class="fas fa-user-graduate mr-2"></i>
+                    Editando: {{ student.full_name }}
+                </h2>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data" class="p-6 space-y-6" id="studentForm">
+                {% csrf_token %}
+                
+                <!-- Nombres y Apellidos -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user text-blue-500 mr-1"></i>
+                            Nombres <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user-friends text-blue-500 mr-1"></i>
+                            Apellidos <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Foto actual -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-camera text-blue-500 mr-1"></i>
+                        Fotografía
+                    </label>
+                    
+                    {% if student.photo %}
+                    <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Foto actual:</p>
+                        <div class="flex items-center space-x-4">
+                            <img src="{{ student.photo.url }}" alt="{{ student.full_name }}" 
+                                 class="w-24 h-24 object-cover rounded-lg border-2 border-gray-300">
+                            <div class="flex-1">
+                                <p class="text-xs text-gray-500 break-all">Archivo: {{ student.photo.name|cut:"users/"|cut:student.user.username|cut:"/" }}</p>
+                                <label class="inline-flex items-center mt-2 text-sm text-blue-600 hover:text-blue-700 cursor-pointer">
+                                    <i class="fas fa-exchange-alt mr-1"></i>
+                                    <span>Cambiar foto</span>
+                                    {{ form.photo }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div>
+                        {{ form.photo }}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Vista previa de nueva foto -->
+                    <div id="photoPreview" class="hidden mt-4">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Nueva foto:</p>
+                        <div class="flex items-center space-x-4">
+                            <img id="previewImage" src="#" alt="Vista previa" class="w-32 h-32 object-cover rounded-lg border border-gray-300">
+                            <button type="button" onclick="clearPhoto()" class="text-sm text-red-600 hover:text-red-700">
+                                <i class="fas fa-trash mr-1"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <p class="mt-1 text-xs text-gray-500">Formatos: PNG, JPG, JPEG. Máximo 10MB</p>
+                    {% if form.photo.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.photo.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Audio actual -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-music text-blue-500 mr-1"></i>
+                        Mensaje de Audio
+                    </label>
+                    
+                    {% if student.audio %}
+                    <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Audio actual:</p>
+                        <div class="space-y-2">
+                            <audio controls class="w-full rounded-lg">
+                                <source src="{{ student.audio.url }}" type="audio/mpeg">
+                                Tu navegador no soporta el elemento de audio.
+                            </audio>
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <p class="text-xs text-gray-500 break-all">Archivo: {{ student.audio.name|cut:"users/"|cut:student.user.username|cut:"/" }}</p>
+                                <label class="inline-flex items-center text-sm text-blue-600 hover:text-blue-700 cursor-pointer">
+                                    <i class="fas fa-exchange-alt mr-1"></i>
+                                    <span>Cambiar audio</span>
+                                    {{ form.audio }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div>
+                        {{ form.audio }}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Vista previa de nuevo audio -->
+                    <div id="audioPreview" class="hidden mt-4">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Nuevo audio:</p>
+                        <div class="space-y-2">
+                            <audio id="previewAudio" controls class="w-full max-w-md rounded-lg">
+                                <source src="#" type="audio/mpeg">
+                                Tu navegador no soporta el elemento de audio.
+                            </audio>
+                            <button type="button" onclick="clearAudio()" class="text-sm text-red-600 hover:text-red-700">
+                                <i class="fas fa-trash mr-1"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <p class="mt-1 text-xs text-gray-500">Formatos: MP3, WAV, OGG. Máximo 20MB</p>
+                    {% if form.audio.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.audio.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Metadatos -->
+                <div class="bg-gray-50 rounded-lg p-4 text-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <span class="font-medium text-gray-700">Fecha de creación:</span>
+                            <span class="text-gray-600 ml-2">{{ student.created_at|date:"d/m/Y H:i:s" }}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-700">Última actualización:</span>
+                            <span class="text-gray-600 ml-2">{{ student.updated_at|date:"d/m/Y H:i:s" }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 transform hover:scale-105">
+                        <i class="fas fa-save mr-2"></i>
+                        Guardar Cambios
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="flex-1 text-center bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Zona de peligro (eliminar) -->
+        <div class="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-sm font-medium text-red-800">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        Zona de peligro
+                    </h3>
+                    <p class="text-sm text-red-700 mt-1">Eliminar este estudiante de forma permanente.</p>
+                </div>
+                <button onclick="confirmDelete()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                    <i class="fas fa-trash mr-2"></i>
+                    Eliminar Estudiante
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Variables para los inputs
+    const photoInput = document.querySelector('#{{ form.photo.id_for_label }}');
+    const audioInput = document.querySelector('#{{ form.audio.id_for_label }}');
+    
+    // Vista previa de nueva foto
+    const photoPreview = document.getElementById('photoPreview');
+    const previewImage = document.getElementById('previewImage');
+    
+    if (photoInput) {
+        photoInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(loadEvent) {
+                    previewImage.src = loadEvent.target.result;
+                    photoPreview.classList.remove('hidden');
+                }
+                reader.readAsDataURL(e.target.files[0]);
+            } else {
+                photoPreview.classList.add('hidden');
+            }
+        });
+    }
+    
+    function clearPhoto() {
+        if (photoInput) {
+            photoInput.value = '';
+            photoPreview.classList.add('hidden');
+            previewImage.src = '#';
+        }
+    }
+    
+    // Vista previa de nuevo audio
+    const audioPreview = document.getElementById('audioPreview');
+    const previewAudio = document.getElementById('previewAudio');
+    
+    if (audioInput) {
+        audioInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(loadEvent) {
+                    previewAudio.src = loadEvent.target.result;
+                    audioPreview.classList.remove('hidden');
+                    previewAudio.load();
+                }
+                reader.readAsDataURL(e.target.files[0]);
+            } else {
+                audioPreview.classList.add('hidden');
+            }
+        });
+    }
+    
+    function clearAudio() {
+        if (audioInput) {
+            audioInput.value = '';
+            audioPreview.classList.add('hidden');
+            previewAudio.src = '#';
+        }
+    }
+    
+    // Confirmar eliminación
+    function confirmDelete() {
+        if (confirm('¿Estás seguro de que deseas eliminar a {{ student.full_name }}? Esta acción no se puede deshacer.')) {
+            window.location.href = '{% url "delete_student" student.id %}';
+        }
+    }
+</script>
+{% endblock %}

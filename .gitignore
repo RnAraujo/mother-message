@@ -1,0 +1,12 @@
+venv/
+media/
+staticfiles/
+
+.vscode/
+*.code-workspace
+
+node_modules/
+
+# Sistema Operativo
+.DS_Store
+Thumbs.db

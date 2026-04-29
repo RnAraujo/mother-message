@@ -1,0 +1,184 @@
+<!-- templates/registration/login.html -->
+{% extends "emotion/base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Logo y título -->
+        <div class="text-center">
+            <div class="mx-auto h-16 w-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                <i class="fas fa-graduation-cap text-3xl text-white"></i>
+            </div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Sistema de Estudiantes
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Inicia sesión para acceder al sistema
+            </p>
+        </div>
+        
+        <!-- Formulario de login -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Mensajes de error generales -->
+                {% if form.non_field_errors %}
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-circle text-red-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700">
+                                    {% for error in form.non_field_errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- Campo de usuario -->
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-user text-blue-500 mr-1"></i>
+                        Nombre de usuario
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                        {{ form.username }}
+                    </div>
+                    {% if form.username.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Campo de contraseña -->
+                <div>
+                    <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock text-blue-500 mr-1"></i>
+                        Contraseña
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        {{ form.password }}
+                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <i id="passwordToggleIcon" class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                        </button>
+                    </div>
+                    {% if form.password.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.password.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Opciones adicionales -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember_me" name="remember_me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="remember_me" class="ml-2 block text-sm text-gray-900">
+                            Recordarme
+                        </label>
+                    </div>
+                    
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Botón de inicio de sesión -->
+                <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 transform hover:scale-105">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fas fa-sign-in-alt text-blue-300 group-hover:text-blue-200"></i>
+                    </span>
+                    Iniciar Sesión
+                </button>
+            </form>
+            
+            <!-- Separador -->
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">
+                        ¿Nuevo usuario?
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Enlace de registro -->
+            <div>
+                <a href="{% url 'register' %}" class="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 transition duration-200">
+                    <i class="fas fa-user-plus mr-2 text-blue-500"></i>
+                    Crear una nueva cuenta
+                </a>
+            </div>
+        </div>
+        
+        <!-- Información adicional -->
+        <div class="text-center text-xs text-gray-500">
+            <p class="mt-4">
+                <i class="fas fa-shield-alt mr-1"></i>
+                Tus datos están seguros con nosotros
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Función para mostrar/ocultar contraseña
+    function togglePassword() {
+        const passwordField = document.getElementById('{{ form.password.id_for_label }}');
+        const toggleIcon = document.getElementById('passwordToggleIcon');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+    
+    // Auto-focus en el campo de usuario
+    document.addEventListener('DOMContentLoaded', function() {
+        const usernameField = document.getElementById('{{ form.username.id_for_label }}');
+        if (usernameField) {
+            usernameField.focus();
+        }
+    });
+</script>
+
+<style>
+    /* Estilos adicionales para el formulario */
+    input:focus {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Animación de entrada */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .bg-white {
+        animation: fadeInUp 0.6s ease-out;
+    }
+</style>
+{% endblock %}

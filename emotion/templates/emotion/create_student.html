@@ -1,0 +1,231 @@
+<!-- templates/create_student.html -->
+{% extends "emotion/base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Encabezado -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">
+                        <i class="fas fa-user-plus text-blue-600 mr-3"></i>
+                        Registrar Nuevo Estudiante
+                    </h1>
+                    <p class="text-gray-600 mt-2">Completa el formulario para agregar un nuevo estudiante</p>
+                </div>
+                <a href="{% url 'dashboard' %}" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Volver al Dashboard
+                </a>
+            </div>
+        </div>
+        
+        <!-- Indicador de límite -->
+        <div class="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm text-blue-700">
+                        <strong>Límite de estudiantes:</strong> Has registrado {{ user_limit.current_count }} de {{ user_limit.max_students }} estudiantes.
+                    </p>
+                    <div class="mt-2 w-full bg-blue-200 rounded-full h-2">
+                        <div class="bg-blue-600 rounded-full h-2 transition-all duration-500" 
+                             style="width: {{ limit_percent }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Formulario -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600">
+                <h2 class="text-xl font-semibold text-white">
+                    <i class="fas fa-edit mr-2"></i>
+                    Datos del Estudiante
+                </h2>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data" class="p-6 space-y-6" id="studentForm">
+                {% csrf_token %}
+                
+                <!-- Nombres y Apellidos -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user text-blue-500 mr-1"></i>
+                            Nombres <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user-friends text-blue-500 mr-1"></i>
+                            Apellidos <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Foto -->
+                <div>
+                    <label for="{{ form.photo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-camera text-blue-500 mr-1"></i>
+                        Fotografía <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        {{ form.photo }}
+                    </div>
+                    
+                    <!-- Vista previa de la foto -->
+                    <div id="photoPreview" class="hidden mt-4">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Vista previa:</p>
+                        <img id="previewImage" src="#" alt="Vista previa" class="w-32 h-32 object-cover rounded-lg border border-gray-300">
+                        <button type="button" onclick="clearPhoto()" class="mt-2 text-sm text-red-600 hover:text-red-700">
+                            <i class="fas fa-trash mr-1"></i> Eliminar foto
+                        </button>
+                    </div>
+                    
+                    <p class="mt-1 text-xs text-gray-500">Formatos permitidos: PNG, JPG, JPEG. Máximo 10MB</p>
+                    {% if form.photo.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.photo.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Audio -->
+                <div>
+                    <label for="{{ form.audio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-music text-blue-500 mr-1"></i>
+                        Mensaje de Audio <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-1">
+                        {{ form.audio }}
+                    </div>
+                    
+                    <!-- Reproductor de audio para vista previa -->
+                    <div id="audioPreview" class="hidden mt-4">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Vista previa:</p>
+                        <audio id="previewAudio" controls class="w-full max-w-md rounded-lg">
+                            <source src="#" type="audio/mpeg">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                        <button type="button" onclick="clearAudio()" class="mt-2 text-sm text-red-600 hover:text-red-700">
+                            <i class="fas fa-trash mr-1"></i> Eliminar audio
+                        </button>
+                    </div>
+                    
+                    <p class="mt-1 text-xs text-gray-500">Formatos permitidos: MP3, WAV, OGG. Máximo 20MB</p>
+                    {% if form.audio.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.audio.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Campos requeridos -->
+                <div class="text-sm text-gray-500">
+                    <p><span class="text-red-500">*</span> Campos obligatorios</p>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 transform hover:scale-105">
+                        <i class="fas fa-save mr-2"></i>
+                        Registrar Estudiante
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="flex-1 text-center bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Información adicional -->
+        <div class="mt-6 bg-blue-50 rounded-lg p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-lightbulb text-blue-500 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">Consejos útiles:</h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>La foto se mostrará en la tarjeta del estudiante</li>
+                            <li>El audio se reproducirá automáticamente al escanear el QR</li>
+                            <li>Puedes editar esta información más tarde</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Vista previa de foto
+    const photoInput = document.querySelector('#{{ form.photo.id_for_label }}');
+    const photoPreview = document.getElementById('photoPreview');
+    const previewImage = document.getElementById('previewImage');
+    
+    if (photoInput) {
+        photoInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(loadEvent) {
+                    previewImage.src = loadEvent.target.result;
+                    photoPreview.classList.remove('hidden');
+                }
+                reader.readAsDataURL(e.target.files[0]);
+            } else {
+                photoPreview.classList.add('hidden');
+            }
+        });
+    }
+    
+    function clearPhoto() {
+        if (photoInput) {
+            photoInput.value = '';
+            photoPreview.classList.add('hidden');
+            previewImage.src = '#';
+        }
+    }
+    
+    // Vista previa de audio
+    const audioInput = document.querySelector('#{{ form.audio.id_for_label }}');
+    const audioPreview = document.getElementById('audioPreview');
+    const previewAudio = document.getElementById('previewAudio');
+    
+    if (audioInput) {
+        audioInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(loadEvent) {
+                    previewAudio.src = loadEvent.target.result;
+                    audioPreview.classList.remove('hidden');
+                    previewAudio.load();
+                }
+                reader.readAsDataURL(e.target.files[0]);
+            } else {
+                audioPreview.classList.add('hidden');
+            }
+        });
+    }
+    
+    function clearAudio() {
+        if (audioInput) {
+            audioInput.value = '';
+            audioPreview.classList.add('hidden');
+            previewAudio.src = '#';
+        }
+    }
+</script>
+{% endblock %}

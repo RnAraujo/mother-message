@@ -1,0 +1,54 @@
+{% extends "emotion/base.html" %}
+
+{% block content %}
+<div class="columns is-centered">
+    <div class="column is-5-tablet is-4-desktop">
+        <div class="box" style="box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-left: 4px solid #f14668;">
+            <h1 class="title has-text-danger">
+                <i class="fas fa-trash-alt"></i> Eliminar Estudiante
+            </h1>
+            
+            <div class="content">
+                <p>
+                    ¿Estás seguro de que deseas eliminar a <strong>{{ student.full_name }}</strong>?
+                </p>
+                <p class="has-text-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Esta acción <strong>no se puede deshacer</strong>.
+                </p>
+            </div>
+            
+            {% if student.photo %}
+            <div class="box" style="background: #f9f9f9; margin-bottom: 1.5rem;">
+                <figure class="image is-128x128" style="margin: 0 auto;">
+                    <img src="{{ student.photo.url }}" alt="Foto" style="border-radius: 8px;">
+                </figure>
+            </div>
+            {% endif %}
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="field is-grouped">
+                    <div class="control is-expanded">
+                        <button type="submit" class="button is-danger is-fullwidth is-medium">
+                            <span class="icon">
+                                <i class="fas fa-trash-alt"></i>
+                            </span>
+                            <span>Sí, Eliminar Permanentemente</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="field">
+                    <div class="control">
+                        <a href="{% url 'dashboard' %}" class="button is-light is-fullwidth">
+                            <span>Cancelar</span>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
