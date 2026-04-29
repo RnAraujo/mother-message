@@ -1,4 +1,4 @@
-<!-- templates/emotion/base.html -->
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Recuerdo Digital para Mamá ❤️{% endblock %}</title>
     
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'emotion/css/output.css' %}">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -119,18 +118,6 @@
         </div>
     </footer>
     {% endif %}
-    
-    <script>
-        // Auto cerrar mensajes después de 5 segundos
-        setTimeout(function() {
-            const messages = document.querySelectorAll('.rounded-lg');
-            messages.forEach(message => {
-                message.style.transition = 'opacity 0.5s ease';
-                message.style.opacity = '0';
-                setTimeout(() => message.remove(), 500);
-            });
-        }, 5000);
-    </script>
     
     {% block extra_js %}{% endblock %}
 </body>
